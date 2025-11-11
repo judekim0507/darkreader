@@ -23,6 +23,8 @@ import {
     StyleSystemControls,
     TextColor,
     TextStroke,
+    TintColor,
+    TintStrength,
     UseFont,
 } from '../controls';
 import ThemePresetPicker from '../preset-picker';
@@ -129,6 +131,23 @@ interface FontGroupsProps extends ThemeGroupProps {
     viewProps: ViewProps;
 }
 
+function BoostsGroup({theme, change}: ThemeGroupProps) {
+    return (
+        <Array>
+            <TintColor
+                value={theme.tintColor}
+                onChange={(v) => change({tintColor: v})}
+                canReset={theme.tintColor !== DEFAULT_THEME.tintColor}
+                onReset={() => change({tintColor: DEFAULT_THEME.tintColor})}
+            />
+            <TintStrength
+                value={theme.tintStrength}
+                onChange={(v) => change({tintStrength: v})}
+            />
+        </Array>
+    );
+}
+
 function FontGroup({theme, fonts, viewProps, change}: FontGroupsProps) {
     const {settings, activeTab, isAllowedFileSchemeAccess} = viewProps.data;
     const {isDarkThemeDetected, isInDarkList, isInjected, isProtected} = activeTab;
@@ -176,6 +195,9 @@ export default function ThemePage(props: ViewProps) {
             <Collapsible>
                 <Collapsible.Group id="main" label="Brightness, contrast, mode">
                     <MainGroup theme={theme} change={change} />
+                </Collapsible.Group>
+                <Collapsible.Group id="boosts" label="Boosts (Color Tinting)">
+                    <BoostsGroup theme={theme} change={change} />
                 </Collapsible.Group>
                 <Collapsible.Group id="colors" label="Colors">
                     <ColorsGroup theme={theme} change={change} colorSchemes={props.data.colorScheme} />

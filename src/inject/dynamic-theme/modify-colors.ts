@@ -42,6 +42,8 @@ export const themeCacheKeys: Array<keyof Theme> = [
     'darkSchemeTextColor',
     'lightSchemeBackgroundColor',
     'lightSchemeTextColor',
+    'tintColor',
+    'tintStrength',
 ];
 extendThemeCacheKeys(themeCacheKeys);
 
@@ -54,6 +56,56 @@ function getCacheId(rgb: RGBA, theme: Theme): string {
         resultId += `${theme[key]};`;
     });
     return resultId;
+}
+
+/**
+ * Apply color tinting (Boosts feature)
+ * Blends the color with a tint color based on the tint strength
+ * @param hsl - The HSL color to tint
+ * @param tintColor - The tint color (hex, rgb, or color name)
+ * @param tintStrength - The strength of the tint (0-100)
+ * @returns The tinted HSL color
+ */
+function applyTint(hsl: HSLA, tintColor: string, tintStrength: number): HSLA {
+    if (!tintColor || tintStrength <= 0) {
+        return hsl;
+    }
+    
+    const tintRGB = parseToHSLWithCache(tintColor);
+    if (!tintRGB) {
+        return hsl;
+    }
+    
+    // Normalize tint strength to 0-1 range
+    const strength = Math.min(100, Math.max(0, tintStrength)) / 100;
+    
+    // Blend hue: shift towards tint hue
+    // Use circular blending for hue (since hue is circular: 0-360)
+    let hueDiff = tintRGB.h - hsl.h;
+    if (hueDiff > 180) {
+        hueDiff -= 360;
+    } else if (hueDiff < -180) {
+        hueDiff += 360;
+    }
+    const newHue = (hsl.h + hueDiff * strength * 0.6) % 360;
+    const finalHue = newHue < 0 ? newHue + 360 : newHue;
+    
+    // Blend saturation: shift towards tint saturation
+    const saturationDiff = tintRGB.s - hsl.s;
+    const newSaturation = hsl.s + saturationDiff * strength * 0.5;
+    const finalSaturation = Math.min(1, Math.max(0, newSaturation));
+    
+    // Preserve lightness mostly, with subtle influence from tint
+    const lightnessDiff = tintRGB.l - hsl.l;
+    const newLightness = hsl.l + lightnessDiff * strength * 0.2;
+    const finalLightness = Math.min(1, Math.max(0, newLightness));
+    
+    return {
+        h: finalHue,
+        s: finalSaturation,
+        l: finalLightness,
+        a: hsl.a,
+    };
 }
 
 function modifyColorWithCache(rgb: RGBA, theme: Theme, modifyHSL: (hsl: HSLA, pole?: HSLA | null, anotherPole?: HSLA | null) => HSLA, poleColor?: string, anotherPoleColor?: string): string {
@@ -72,7 +124,13 @@ function modifyColorWithCache(rgb: RGBA, theme: Theme, modifyHSL: (hsl: HSLA, po
     const hsl = rgbToHSL(rgb);
     const pole = poleColor == null ? null : parseToHSLWithCache(poleColor);
     const anotherPole = anotherPoleColor == null ? null : parseToHSLWithCache(anotherPoleColor);
-    const modified = modifyHSL(hsl, pole, anotherPole);
+    let modified = modifyHSL(hsl, pole, anotherPole);
+    
+    // Apply tinting (Boosts feature)
+    if (theme.tintColor && theme.tintStrength > 0) {
+        modified = applyTint(modified, theme.tintColor, theme.tintStrength);
+    }
+    
     const {r, g, b, a} = hslToRGB(modified);
     const matrix = createFilterMatrix({...theme, mode: 0});
     const [rf, gf, bf] = applyColorMatrix([r, g, b], matrix);

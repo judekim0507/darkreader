@@ -79,6 +79,9 @@ export interface Theme {
     lightColorScheme: string;
     darkColorScheme: string;
     immediateModify: boolean;
+    // Boosts: Color tinting feature
+    tintColor: string;
+    tintStrength: number;
 }
 
 export interface CustomSiteConfig {
