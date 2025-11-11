@@ -1,9 +1,10 @@
 import {m} from 'malevic';
 
+import {DEFAULT_THEME} from '../../../../defaults';
 import type {ExtWrapper, Theme} from '../../../../definitions';
 import {getLocalMessage} from '../../../../utils/locales';
 import {isURLInList} from '../../../../utils/url';
-import {UpDown} from '../../../controls';
+import {UpDown, ColorPicker} from '../../../controls';
 import CustomSettingsToggle from '../custom-settings-toggle';
 
 import ModeToggle from './mode-toggle';
@@ -69,6 +70,32 @@ export default function FilterSettings({data, actions}: ExtWrapper, ...children:
         />
     );
 
+    const tintColorSection = (
+        <div class="filter-settings__tint-color">
+            <label class="filter-settings__tint-color-label">
+                Tint Color
+            </label>
+            <ColorPicker
+                color={theme.tintColor || '#3b82f6'}
+                onChange={(value) => setConfig({tintColor: value})}
+                canReset={theme.tintColor !== DEFAULT_THEME.tintColor}
+                onReset={() => setConfig({tintColor: DEFAULT_THEME.tintColor})}
+            />
+        </div>
+    );
+
+    const tintStrength = (
+        <UpDown
+            value={theme.tintStrength}
+            min={0}
+            max={100}
+            step={5}
+            default={0}
+            name="Tint Strength"
+            onChange={(value) => setConfig({tintStrength: value})}
+        />
+    );
+
     return (
         <section class="filter-settings">
             <ModeToggle mode={theme.mode} onChange={(mode) => setConfig({mode})} />
@@ -76,6 +103,8 @@ export default function FilterSettings({data, actions}: ExtWrapper, ...children:
             {contrast}
             {sepia}
             {grayscale}
+            {tintColorSection}
+            {tintStrength}
             <CustomSettingsToggle data={data} actions={actions} />
             <div class="filter-settings__content">
                 {...children}
