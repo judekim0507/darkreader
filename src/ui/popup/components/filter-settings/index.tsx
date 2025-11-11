@@ -69,6 +69,18 @@ export default function FilterSettings({data, actions}: ExtWrapper, ...children:
         />
     );
 
+    const tintStrength = (
+        <UpDown
+            value={theme.tintStrength}
+            min={0}
+            max={100}
+            step={5}
+            default={0}
+            name="Tint Strength"
+            onChange={(value) => setConfig({tintStrength: value})}
+        />
+    );
+
     return (
         <section class="filter-settings">
             <ModeToggle mode={theme.mode} onChange={(mode) => setConfig({mode})} />
@@ -76,6 +88,7 @@ export default function FilterSettings({data, actions}: ExtWrapper, ...children:
             {contrast}
             {sepia}
             {grayscale}
+            {tintStrength}
             <CustomSettingsToggle data={data} actions={actions} />
             <div class="filter-settings__content">
                 {...children}
