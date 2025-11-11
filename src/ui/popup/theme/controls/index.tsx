@@ -15,6 +15,8 @@ import Sepia from './sepia';
 import StyleSystemControls from './style-system-controls';
 import TextColor from './text-color';
 import TextStroke from './text-stroke';
+import TintColor from './tint-color';
+import TintStrength from './tint-strength';
 import UseFont from './use-font';
 
 export {
@@ -35,5 +37,7 @@ export {
     StyleSystemControls,
     TextColor,
     TextStroke,
+    TintColor,
+    TintStrength,
     UseFont,
 };

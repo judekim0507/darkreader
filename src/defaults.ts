@@ -40,6 +40,9 @@ export const DEFAULT_THEME: Theme = {
     lightColorScheme: 'Default',
     darkColorScheme: 'Default',
     immediateModify: false,
+    // Boosts: Color tinting defaults
+    tintColor: '',
+    tintStrength: 0,
 };
 
 if (__PLUS__) {
