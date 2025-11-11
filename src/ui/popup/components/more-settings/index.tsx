@@ -1,10 +1,11 @@
 import {m} from 'malevic';
 
+import {DEFAULT_THEME} from '../../../../defaults';
 import type {ExtWrapper, Theme} from '../../../../definitions';
 import {getLocalMessage} from '../../../../utils/locales';
 import {isFirefox} from '../../../../utils/platform';
 import {isURLInList} from '../../../../utils/url';
-import {Button, Toggle} from '../../../controls';
+import {Button, Toggle, ColorPicker} from '../../../controls';
 import {SettingsIcon} from '../../../icons';
 import {openExtensionPage} from '../../../utils';
 import CustomSettingsToggle from '../custom-settings-toggle';
@@ -66,6 +67,20 @@ export default function MoreSettings({data, actions, fonts}: ExtWrapper & {fonts
                     </p>
                 </div>
             ) : null}
+            <div class="more-settings__section">
+                <label class="more-settings__section-label">
+                    Tint Color (Boosts)
+                </label>
+                <ColorPicker
+                    color={theme.tintColor || '#3b82f6'}
+                    onChange={(value) => setConfig({tintColor: value})}
+                    canReset={theme.tintColor !== DEFAULT_THEME.tintColor}
+                    onReset={() => setConfig({tintColor: DEFAULT_THEME.tintColor})}
+                />
+                <p class="more-settings__description">
+                    Choose a color to tint the entire website. Adjust the strength in the Filter tab.
+                </p>
+            </div>
             <div class="more-settings__section">
                 <Button onclick={openSettings} class="more-settings__settings-button">
                     <span class="more-settings__settings-button__wrapper">
