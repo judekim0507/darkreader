@@ -64,9 +64,10 @@ function getCacheId(rgb: RGBA, theme: Theme): string {
  * @param hsl - The HSL color to tint
  * @param tintColor - The tint color (hex, rgb, or color name)
  * @param tintStrength - The strength of the tint (0-100)
+ * @param colorType - The type of color being tinted (background, border, or text)
  * @returns The tinted HSL color
  */
-function applyTint(hsl: HSLA, tintColor: string, tintStrength: number): HSLA {
+function applyTint(hsl: HSLA, tintColor: string, tintStrength: number, colorType: 'background' | 'border' | 'text' | 'other' = 'other'): HSLA {
     if (!tintColor || tintStrength <= 0) {
         return hsl;
     }
@@ -79,6 +80,20 @@ function applyTint(hsl: HSLA, tintColor: string, tintStrength: number): HSLA {
     // Normalize tint strength to 0-1 range
     const strength = Math.min(100, Math.max(0, tintStrength)) / 100;
     
+    // Adjust tint intensity based on color type
+    // Borders should maintain their subtle contrast relationship with backgrounds
+    let hueStrength = 0.6;
+    let saturationStrength = 0.5;
+    let lightnessStrength = 0.2;
+    
+    if (colorType === 'border') {
+        // For borders: apply much weaker tinting to preserve original contrast
+        // This keeps borders subtle relative to backgrounds instead of creating new contrast
+        hueStrength = 0.25;  // Minimal hue shift to maintain color family
+        saturationStrength = 0.2;  // Keep original saturation mostly intact
+        lightnessStrength = 0.1;  // Minimal lightness change
+    }
+    
     // Blend hue: shift towards tint hue
     // Use circular blending for hue (since hue is circular: 0-360)
     let hueDiff = tintRGB.h - hsl.h;
@@ -87,17 +102,17 @@ function applyTint(hsl: HSLA, tintColor: string, tintStrength: number): HSLA {
     } else if (hueDiff < -180) {
         hueDiff += 360;
     }
-    const newHue = (hsl.h + hueDiff * strength * 0.6) % 360;
+    const newHue = (hsl.h + hueDiff * strength * hueStrength) % 360;
     const finalHue = newHue < 0 ? newHue + 360 : newHue;
     
     // Blend saturation: shift towards tint saturation
     const saturationDiff = tintRGB.s - hsl.s;
-    const newSaturation = hsl.s + saturationDiff * strength * 0.5;
+    const newSaturation = hsl.s + saturationDiff * strength * saturationStrength;
     const finalSaturation = Math.min(1, Math.max(0, newSaturation));
     
-    // Preserve lightness mostly, with subtle influence from tint
+    // Adjust lightness
     const lightnessDiff = tintRGB.l - hsl.l;
-    const newLightness = hsl.l + lightnessDiff * strength * 0.2;
+    const newLightness = hsl.l + lightnessDiff * strength * lightnessStrength;
     const finalLightness = Math.min(1, Math.max(0, newLightness));
     
     return {
@@ -108,7 +123,7 @@ function applyTint(hsl: HSLA, tintColor: string, tintStrength: number): HSLA {
     };
 }
 
-function modifyColorWithCache(rgb: RGBA, theme: Theme, modifyHSL: (hsl: HSLA, pole?: HSLA | null, anotherPole?: HSLA | null) => HSLA, poleColor?: string, anotherPoleColor?: string): string {
+function modifyColorWithCache(rgb: RGBA, theme: Theme, modifyHSL: (hsl: HSLA, pole?: HSLA | null, anotherPole?: HSLA | null) => HSLA, poleColor?: string, anotherPoleColor?: string, colorType: 'background' | 'border' | 'text' | 'other' = 'other'): string {
     let fnCache: Map<string, string>;
     if (colorModificationCache.has(modifyHSL)) {
         fnCache = colorModificationCache.get(modifyHSL)!;
@@ -128,7 +143,7 @@ function modifyColorWithCache(rgb: RGBA, theme: Theme, modifyHSL: (hsl: HSLA, po
     
     // Apply tinting (Boosts feature)
     if (theme.tintColor && theme.tintStrength > 0) {
-        modified = applyTint(modified, theme.tintColor, theme.tintStrength);
+        modified = applyTint(modified, theme.tintColor, theme.tintStrength, colorType);
     }
     
     const {r, g, b, a} = hslToRGB(modified);
@@ -246,16 +261,16 @@ function _modifyBackgroundColor(rgb: RGBA, theme: Theme) {
     if (theme.mode === 0) {
         if (__PLUS__) {
             const poles = getBackgroundPoles(theme);
-            return modifyColorWithCache(rgb, theme, modifyLightSchemeColorExtended, poles[0], poles[1]);
+            return modifyColorWithCache(rgb, theme, modifyLightSchemeColorExtended, poles[0], poles[1], 'background');
         }
         return modifyLightSchemeColor(rgb, theme);
     }
     if (__PLUS__) {
         const poles = getBackgroundPoles(theme);
-        return modifyColorWithCache(rgb, theme, modifyBgColorExtended, poles[0], poles[1]);
+        return modifyColorWithCache(rgb, theme, modifyBgColorExtended, poles[0], poles[1], 'background');
     }
     const pole = getBgPole(theme);
-    return modifyColorWithCache(rgb, theme, modifyBgHSL, pole);
+    return modifyColorWithCache(rgb, theme, modifyBgHSL, pole, undefined, 'background');
 }
 
 export function modifyBackgroundColor(rgb: RGBA, theme: Theme, shouldRegisterColorVariable = true): string {
@@ -312,16 +327,16 @@ function _modifyForegroundColor(rgb: RGBA, theme: Theme) {
     if (theme.mode === 0) {
         if (__PLUS__) {
             const poles = getTextPoles(theme);
-            return modifyColorWithCache(rgb, theme, modifyLightSchemeColorExtended, poles[0], poles[1]);
+            return modifyColorWithCache(rgb, theme, modifyLightSchemeColorExtended, poles[0], poles[1], 'text');
         }
         return modifyLightSchemeColor(rgb, theme);
     }
     if (__PLUS__) {
         const poles = getTextPoles(theme);
-        return modifyColorWithCache(rgb, theme, modifyFgColorExtended, poles[0], poles[1]);
+        return modifyColorWithCache(rgb, theme, modifyFgColorExtended, poles[0], poles[1], 'text');
     }
     const pole = getFgPole(theme);
-    return modifyColorWithCache(rgb, theme, modifyFgHSL, pole);
+    return modifyColorWithCache(rgb, theme, modifyFgHSL, pole, undefined, 'text');
 }
 
 export function modifyForegroundColor(rgb: RGBA, theme: Theme, shouldRegisterColorVariable = true): string {
@@ -359,7 +374,7 @@ function _modifyBorderColor(rgb: RGBA, theme: Theme) {
     }
     const poleFg = getFgPole(theme);
     const poleBg = getBgPole(theme);
-    return modifyColorWithCache(rgb, theme, modifyBorderHSL, poleFg, poleBg);
+    return modifyColorWithCache(rgb, theme, modifyBorderHSL, poleFg, poleBg, 'border');
 }
 
 export function modifyBorderColor(rgb: RGBA, theme: Theme, shouldRegisterColorVariable = true): string {
