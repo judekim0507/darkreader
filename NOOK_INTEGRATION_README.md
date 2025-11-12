@@ -11,6 +11,8 @@ This package contains everything you need to integrate Dark Reader natively into
 | **[INTEGRATION_SUMMARY.md](INTEGRATION_SUMMARY.md)** | Executive summary & action plan | 5 min | ⭐ **YES** |
 | **[NOOK_BROWSER_QUICKSTART.md](NOOK_BROWSER_QUICKSTART.md)** | 5-step minimal integration | 10 min | ⭐ **YES** |
 | **[NookBrowserExample.swift](NookBrowserExample.swift)** | Copy-paste ready Swift code | 15 min | ⭐ **YES** |
+| **[DARKREADER_API_REFERENCE.md](DARKREADER_API_REFERENCE.md)** | Complete API command reference | 30 min | 📚 Reference |
+| **[API_QUICK_REFERENCE.md](API_QUICK_REFERENCE.md)** | Quick command cheat sheet | 5 min | 📚 Reference |
 | **[NOOK_BROWSER_INTEGRATION_GUIDE.md](NOOK_BROWSER_INTEGRATION_GUIDE.md)** | Complete technical guide | 45 min | Read 2nd |
 | **[COLOR_TINTING_TECHNICAL_GUIDE.md](COLOR_TINTING_TECHNICAL_GUIDE.md)** | Deep dive on color tinting | 30 min | For advanced |
 | **[NATIVE_VS_EXTENSION.md](NATIVE_VS_EXTENSION.md)** | Why native integration is better | 20 min | For decision makers |
@@ -278,9 +280,11 @@ Answer: **You have everything you need right here!**
 2. [INTEGRATION_SUMMARY.md](INTEGRATION_SUMMARY.md) - Start here
 3. [NOOK_BROWSER_QUICKSTART.md](NOOK_BROWSER_QUICKSTART.md) - 5-step guide
 4. [NookBrowserExample.swift](NookBrowserExample.swift) - Swift code
-5. [NOOK_BROWSER_INTEGRATION_GUIDE.md](NOOK_BROWSER_INTEGRATION_GUIDE.md) - Full guide
-6. [COLOR_TINTING_TECHNICAL_GUIDE.md](COLOR_TINTING_TECHNICAL_GUIDE.md) - Tinting deep dive
-7. [NATIVE_VS_EXTENSION.md](NATIVE_VS_EXTENSION.md) - Comparison
+5. [DARKREADER_API_REFERENCE.md](DARKREADER_API_REFERENCE.md) - Complete API reference
+6. [API_QUICK_REFERENCE.md](API_QUICK_REFERENCE.md) - Quick command list
+7. [NOOK_BROWSER_INTEGRATION_GUIDE.md](NOOK_BROWSER_INTEGRATION_GUIDE.md) - Full guide
+8. [COLOR_TINTING_TECHNICAL_GUIDE.md](COLOR_TINTING_TECHNICAL_GUIDE.md) - Tinting deep dive
+9. [NATIVE_VS_EXTENSION.md](NATIVE_VS_EXTENSION.md) - Comparison
 
 ---
 
